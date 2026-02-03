@@ -3,6 +3,7 @@ from metrics import rmse, mae
 from baseline import BaselinePredictor
 from user_cf import UserBasedCF
 from item_cf import ItemBasedCF
+from mf_basic import BasicMF
 
 def evaluate(model, test_ratings):
     preds = []
@@ -34,6 +35,12 @@ def main():
     item_cf.fit(train)
     r, m = evaluate(item_cf, test)
     print(f"Item-Based CF - RMSE: {r:.4f}, MAE: {m:.4f}")
+
+    print("\nTraining Basic MF (P*Q)...")
+    mf_basic = BasicMF(n_factors=20, lr=0.01, epochs=50)
+    mf_basic.fit(train, n_users, n_items, user_to_idx, item_to_idx)
+    r, m = evaluate(mf_basic, test)
+    print(f"Basic MF - RMSE: {r:.4f}, MAE: {m:.4f}")
 
 if __name__ == "__main__":
     main()
