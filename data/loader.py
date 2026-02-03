@@ -4,6 +4,36 @@ import os
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "ml-latest-small")
 
+# All possible genres in MovieLens
+ALL_GENRES = [
+    'Action', 'Adventure', 'Animation', 'Children', 'Comedy', 'Crime',
+    'Documentary', 'Drama', 'Fantasy', 'Film-Noir', 'Horror', 'Musical',
+    'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'War', 'Western', 'IMAX', '(no genres listed)'
+]
+GENRE_TO_IDX = {g: i for i, g in enumerate(ALL_GENRES)}
+N_GENRES = len(ALL_GENRES)
+
+def load_genres():
+    """Load movie genres as multi-hot vectors"""
+    path = os.path.join(DATA_DIR, "movies.csv")
+    movie_genres = {}
+
+    with open(path, 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        next(reader)  # skip header
+        for row in reader:
+            movie_id = int(row[0])
+            genres = row[2].split('|')
+
+            # multi-hot encoding
+            genre_vec = np.zeros(N_GENRES)
+            for g in genres:
+                if g in GENRE_TO_IDX:
+                    genre_vec[GENRE_TO_IDX[g]] = 1
+            movie_genres[movie_id] = genre_vec
+
+    return movie_genres
+
 def load_data(path=None, test_ratio=0.2, seed=42):
     if path is None:
         path = os.path.join(DATA_DIR, "ratings.csv")
